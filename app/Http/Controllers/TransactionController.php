@@ -28,7 +28,7 @@ class TransactionController extends Controller
             $this->transferMoney->execute(
                 $validated['from'],
                 $validated['to'],
-                new Money(($validated['value'] * 100))
+                Money::createFrom($validated['value'])
             );
         } catch (\Exception $e) {
             Log::error("[TRANSFER ERROR] {$e->getFile()}:{$e->getLine()} - {$e->getMessage()}");

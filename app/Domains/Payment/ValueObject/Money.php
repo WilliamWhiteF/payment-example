@@ -18,6 +18,17 @@ class Money implements ValueObjectInterface
         return $this->get() === $ammount;
     }
 
+    /**
+     * Create a Money from float, converting to integer in the process
+     *
+     * @param float $value Expected format DD.dd (2 decimal houses)
+     * @return Money
+     */
+    public static function createFrom(float $value): Money
+    {
+        return new self(($value * 100));
+    }
+
     public function __toString(): string
     {
         return $this->ammount;

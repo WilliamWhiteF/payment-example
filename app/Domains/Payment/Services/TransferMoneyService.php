@@ -2,6 +2,7 @@
 
 namespace App\Domains\Payment\Services;
 
+use App\Domains\Payment\Exceptions\InvalidAmmountException;
 use App\Domains\Payment\Exceptions\NotAuthorizedException;
 use App\Domains\Payment\Exceptions\NotEnoughBalanceException;
 use App\Domains\Payment\Interfaces\PaymentAuthorizerInterface;
@@ -22,6 +23,11 @@ class TransferMoneyService implements ServicesInterface
         if ($from->shopkeeper) {
             throw new NotAuthorizedException('Shopkeeper cant transfer');
         }
+
+        if ($ammount->get() <= 0) {
+            throw new InvalidAmmountException('Invalid Ammount');
+        }
+
         if ($from->getBalance() < $ammount->get()) {
             throw new NotEnoughBalanceException('Not enought balance');
         }
