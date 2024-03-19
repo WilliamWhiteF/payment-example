@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Domains\Payment\Models\User;
+use App\Shared\Interfaces\NotificationInterface;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+class NotificationJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function __construct(
+        private NotificationInterface $notification
+    ) { }
+
+    /**
+     * Realiza a notificação configurada no DI do projeto
+     *
+     * @param User $receiver quem deve receber a notificação
+     * @param string $message a mensagem a ser enviada
+     */
+    public function handle(User $receiver, string $message): void
+    {
+        Log::info("[NOTIFICATION] {$receiver->cpf} - {$message}");
+        $this->notification->notify($receiver, $message);
+    }
+}
