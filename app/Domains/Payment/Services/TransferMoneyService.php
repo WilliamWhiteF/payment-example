@@ -2,15 +2,13 @@
 
 namespace App\Domains\Payment\Services;
 
-use App\Domains\Payment\Exceptions\InvalidAmmountException;
+use App\Domains\Payment\Dto\TransferMoneyDto;
 use App\Domains\Payment\Exceptions\NotAuthorizedException;
-use App\Domains\Payment\Exceptions\NotEnoughBalanceException;
+use App\Domains\Payment\Exceptions\TransferException;
 use App\Domains\Payment\Interfaces\PaymentAuthorizerInterface;
-use App\Domains\Payment\Models\User;
-use App\Jobs\NotificationJob;
 use App\Shared\Interfaces\ServicesInterface;
+use App\Shared\Jobs\NotificationJob;
 use Illuminate\Support\Facades\DB;
-use Money;
 
 class TransferMoneyService implements ServicesInterface
 {
@@ -18,35 +16,35 @@ class TransferMoneyService implements ServicesInterface
         private PaymentAuthorizerInterface $authorizer
     ) {}
 
-    public function execute(User $from, User $receiver, Money $ammount): bool
+    public function execute(TransferMoneyDto $dto): bool
     {
-        if ($from->shopkeeper) {
+        if ($dto->from->shopkeeper) {
             throw new NotAuthorizedException('Shopkeeper cant transfer');
         }
 
-        if ($ammount->get() <= 0) {
-            throw new InvalidAmmountException('Invalid Ammount');
+        if ($dto->ammount->get() <= 0) {
+            throw new TransferException('Invalid Ammount');
         }
 
-        if ($from->getBalance() < $ammount->get()) {
-            throw new NotEnoughBalanceException('Not enought balance');
+        if ($dto->from->balance < $dto->ammount->get()) {
+            throw new TransferException('Not enought balance');
         }
 
         if (!$this->authorizer->authorize()) {
             throw new NotAuthorizedException('Not Authorized to perform this operation');
         }
 
-        DB::transaction(function () use ($from, $receiver, $ammount) {
-            $from->balance -= $ammount;
-            $from->save();
+        DB::transaction(function () use ($dto) {
+            $dto->from->balance -= $dto->ammount->get();
+            $dto->from->save();
 
-            $receiver->balance += $ammount;
-            $receiver->save();
+            $dto->receiver->balance += $dto->ammount->get();
+            $dto->receiver->save();
         });
 
         NotificationJob::dispatch(
-            $receiver,
-            'Transferencia realizada no valor de ' . $ammount
+            $dto->receiver,
+            'Transferencia realizada no valor de ' . $dto->ammount
         );
 
         return true;

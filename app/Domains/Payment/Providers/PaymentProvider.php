@@ -2,7 +2,7 @@
 
 namespace App\Domains\Payment\Providers;
 
-use App\Domains\Payment\Actions\DefaultAuthorizer;
+use App\Domains\Payment\Authorizer\DefaultAuthorizer;
 use App\Domains\Payment\Interfaces\PaymentAuthorizerInterface;
 use Illuminate\Support\ServiceProvider;
 

@@ -5,7 +5,12 @@ services:
         build: .
         command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
         volumes:
-            - .:/app
+            - ./app:/app/app
+            - ./database:/app/database
+            - ./tests:/app/tests
+            - ./routes:/app/routes
+            - ./storage:/app/storage
+            - ./.env:/app/.env
         ports:
             - "8080:8080"
         depends_on:

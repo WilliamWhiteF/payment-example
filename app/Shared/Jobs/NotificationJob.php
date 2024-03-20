@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Shared\Jobs;
 
 use App\Domains\Payment\Models\User;
 use App\Shared\Interfaces\NotificationInterface;
@@ -16,7 +16,8 @@ class NotificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        private NotificationInterface $notification
+        private readonly User $receiver,
+        private readonly string $message
     ) { }
 
     /**
@@ -25,9 +26,9 @@ class NotificationJob implements ShouldQueue
      * @param User $receiver quem deve receber a notificação
      * @param string $message a mensagem a ser enviada
      */
-    public function handle(User $receiver, string $message): void
+    public function handle(NotificationInterface $notification): void
     {
-        Log::info("[NOTIFICATION] {$receiver->cpf} - {$message}");
-        $this->notification->notify($receiver, $message);
+        Log::info("[NOTIFICATION] {$this->receiver->cpf} - {$this->message}");
+        $notification->notify($this->receiver, $this->message);
     }
 }

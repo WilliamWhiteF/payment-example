@@ -18,6 +18,7 @@ echo "Queue started"
 if [ $service == "app" ]; then
     echo "Apply database migrations"
     php artisan migrate
+    php artisan db:seed
 fi
 
 exec "$@"

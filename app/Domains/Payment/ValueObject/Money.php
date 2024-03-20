@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Domains\Payment\ValueObject;
+
 use App\Shared\Interfaces\ValueObjectInterface;
 
 class Money implements ValueObjectInterface
